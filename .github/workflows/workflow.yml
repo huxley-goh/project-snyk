@@ -44,6 +44,7 @@ jobs:
       - name: Scan dependencies using Snyk
         continue-on-error: true
         run: |
+          pip install -r requirements.txt
           snyk monitor --all-projects --org=${{ secrets.SNYK_ORGID }}
       # - name: Upload artifact
       #   uses: actions/upload-artifact@v4 # Use the latest version
