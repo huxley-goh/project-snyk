@@ -32,20 +32,18 @@ jobs:
           curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
           chmod +x ./snyk
           mv ./snyk /usr/local/bin/
+          snyk auth ${{ secrets.SNYK_TOKEN }}
       - name: Scan container image using Snyk
         continue-on-error: true
         run: |
-          cd /usr/local/bin
           snyk container monitor ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }}
       - name: Scan code base using Snyk
         continue-on-error: true
         run: |
-          cd /usr/local/bin
           snyk code test --org=${{ secrets.SNYK_ORGID }} 
       - name: Scan dependencies using Snyk
         continue-on-error: true
         run: |
-          cd /usr/local/bin
           snyk monitor --all-projects --org=${{ secrets.SNYK_ORGID }}
       # - name: Upload artifact
       #   uses: actions/upload-artifact@v4 # Use the latest version
