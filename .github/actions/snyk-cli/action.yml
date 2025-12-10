@@ -1,0 +1,13 @@
+name: "Download Snyk and Initialize"
+description: "Download Snyk and Initialize"
+runs:
+  using: "composite"
+  steps:
+    - name: "Donwload, Install and Initialize Snyk"
+      shell: bash
+      run: |
+        curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+        chmod +x ./snyk
+        mv ./snyk /usr/local/bin/
+        snyk auth ${{ secrets.SNYK_TOKEN }}
+
