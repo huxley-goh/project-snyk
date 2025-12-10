@@ -37,6 +37,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Donwload, Install and Initialize Snyk
         uses: ./.github/actions/snyk-cli
+        with:
+          snyk-token: ${{ secrets.SNYK_TOKEN }}
       - name: Scan app code using Snyk
         continue-on-error: true
         run: |
@@ -69,6 +71,8 @@ jobs:
         run: echo IMAGE_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
       - name: Donwload, Install and Initialize Snyk
         uses: ./.github/actions/snyk-cli
+        with:
+          snyk-token: ${{ secrets.SNYK_TOKEN }}
       - name: Scan container image using Snyk
         continue-on-error: true
         run: |

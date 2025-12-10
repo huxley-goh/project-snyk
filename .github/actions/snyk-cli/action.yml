@@ -1,5 +1,9 @@
 name: "Download Snyk and Initialize"
 description: "Download Snyk and Initialize"
+inputs:
+  snyk-token:
+    description: 'Snyk authentication token'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -9,5 +13,7 @@ runs:
         curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
         chmod +x ./snyk
         mv ./snyk /usr/local/bin/
-        snyk auth ${{ secrets.SNYK_TOKEN }}
+        snyk auth $SNYK_TOKEN
+      env:
+        SNYK_TOKEN: ${{ inputs.snyk-token }}
 
