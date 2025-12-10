@@ -7,6 +7,10 @@ RUN rm /usr/share/nginx/html/index.html
 # Copy your custom index.html into the NGINX web root
 COPY index.html /usr/share/nginx/html/index.html
 
+RUN mkdir /app
+
+COPY print-password.py /app
+
 # Expose port 80 for web traffic
 EXPOSE 80
 
