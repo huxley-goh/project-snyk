@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
 
-  execute:
+  build:
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -27,6 +27,47 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing
+
+  snyk-code-scan:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Donwload, Install and Initialize Snyk
+        run: |
+          curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+          chmod +x ./snyk
+          mv ./snyk /usr/local/bin/
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+      - name: Scan app code using Snyk
+        continue-on-error: true
+        run: |
+          snyk code test --org=${{ secrets.SNYK_ORGID }} --report --project-name=${{ env.GITHUB_REPOSITORY }} --severity-threshold=high --json-file-output=code-vuln.json
+      - name: Scan app dependencies using Snyk
+        continue-on-error: true
+        run: |
+          pip install -r requirements.txt
+          snyk test --all-projects --org=${{ secrets.SNYK_ORGID }} --reachability=true --fail-fast --json-file-output=dependencies-vuln.json --severity-threshold=high --fail-on=all
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4 # Use the latest version
+        with:
+          name: snyk-scan-report
+          path: |
+            code-vuln.json
+            dependencies-vuln.json
+  
+  snyk-image-scan:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Donwload, Install and Initialize Snyk
         run: |
           curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
@@ -36,34 +77,25 @@ jobs:
       - name: Scan container image using Snyk
         continue-on-error: true
         run: |
-          snyk container monitor ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }}
-      - name: Scan code base using Snyk
-        continue-on-error: true
-        run: |
-          snyk code test --org=${{ secrets.SNYK_ORGID }} 
-      - name: Scan dependencies using Snyk
-        continue-on-error: true
-        run: |
-          pip install -r requirements.txt
-          snyk monitor --all-projects --org=${{ secrets.SNYK_ORGID }}
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v4 # Use the latest version
-      #   with:
-      #     name: aqua-trivy-report
-      #     path: |
-      #       /usr/local/bin/image-result.txt
-      #       /usr/local/bin/code-result.txt
-  
-  # report:
-  #   runs-on: ubuntu-latest
-  #   needs: execute
-  #   steps:
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4 # Use the latest version
-  #       with:
-  #         name: aqua-trivy-report # Must match the name used during upload
-  #         path: ./reports
-  #     - name: Read the image report
-  #       run: cat ./reports/image-result.txt
-  #     - name: Read the code report
-  #       run: cat ./reports/code-result.txt
+          snyk container test ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }} --json-file-output=image-vuln.json --severity-threshold=high --fail-on=all
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4 # Use the latest version
+        with:
+          name: snyk-scan-report
+          path: |
+            image-vuln.json
+
+  report:
+    runs-on: ubuntu-latest
+    needs: [snyk-code-scan, snyk-image-scan]
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4 # Use the latest version
+        with:
+          name: snyk-scan-report # Must match the name used during upload
+      - name: Read the code report
+        run: cat code-vuln.json | jq .
+      - name: Read the dependencies report
+        run: cat dependencies-vuln.json | jq .
+      - name: Read the image report
+        run: cat image-vuln.json | jq .
