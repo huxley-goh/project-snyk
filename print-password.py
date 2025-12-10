@@ -1,7 +1,10 @@
-import os
+# Vulnerable: Hardcoded password
+PASSWORD = "mysecretpassword123"
 
-def insecure_function(password):
-    print("Received password: " + password)
+def authenticate(provided_password):
+    if provided_password == PASSWORD:
+        print("Authentication successful!")
+    else:
+        print("Authentication failed.")
 
-user_input = "sensitivePassword"
-insecure_function(user_input)
+authenticate("wrong_password")
