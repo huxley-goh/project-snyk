@@ -54,6 +54,7 @@ jobs:
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
           name: snyk-scan-report-${{ github.run_id }}
+          overwrite: true
           path: |
             code-vuln.json
             dependencies-vuln.json
@@ -84,6 +85,7 @@ jobs:
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
           name: snyk-scan-report-${{ github.run_id }}
+          overwrite: true
           path: |
             image-vuln.json
 
