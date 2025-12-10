@@ -44,7 +44,7 @@ jobs:
       - name: Scan app code using Snyk
         continue-on-error: true
         run: |
-          snyk code test --org=${{ secrets.SNYK_ORGID }} --report --project-name=${{ env.GITHUB_REPOSITORY }} --severity-threshold=high --json-file-output=code-vuln.json
+          snyk code test --org=${{ secrets.SNYK_ORGID }} --report --project-name=${{ github.repository }} --severity-threshold=high --json-file-output=code-vuln.json
       - name: Scan app dependencies using Snyk
         continue-on-error: true
         run: |
@@ -68,6 +68,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Convert Repository Name to LowerCase
+        run: echo IMAGE_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
       - name: Donwload, Install and Initialize Snyk
         run: |
           curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
