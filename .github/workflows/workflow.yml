@@ -36,7 +36,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Donwload, Install and Initialize Snyk
-        uses: ./.github/actions/snyk-cli@main
+        uses: ./.github/actions/snyk-cli
       - name: Scan app code using Snyk
         continue-on-error: true
         run: |
@@ -68,7 +68,7 @@ jobs:
       - name: Convert Repository Name to LowerCase
         run: echo IMAGE_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
       - name: Donwload, Install and Initialize Snyk
-        uses: ./.github/actions/snyk-cli@main
+        uses: ./.github/actions/snyk-cli
       - name: Scan container image using Snyk
         continue-on-error: true
         run: |
