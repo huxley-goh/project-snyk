@@ -44,12 +44,12 @@ jobs:
       - name: Scan app code using Snyk
         continue-on-error: true
         run: |
-          snyk code test --org=${{ secrets.SNYK_ORGID }} --report --project-name=${{ github.repository }} --severity-threshold=high --json-file-output=code-vuln.json
+          snyk code test --org=${{ secrets.SNYK_ORGID }} --report --project-name=${{ github.repository }} --json-file-output=code-vuln.json
       - name: Scan app dependencies using Snyk
         continue-on-error: true
         run: |
           pip install -r requirements.txt
-          snyk test --all-projects --org=${{ secrets.SNYK_ORGID }} --reachability=true --fail-fast --json-file-output=dependencies-vuln.json --severity-threshold=high --fail-on=all
+          snyk test --all-projects --org=${{ secrets.SNYK_ORGID }} --reachability=true --fail-fast --json-file-output=dependencies-vuln.json --severity-threshold=high --fail-on=all -d
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
