@@ -53,7 +53,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
-          name: snyk-scan-report
+          name: snyk-scan-report-${{ github.run_id }}
           path: |
             code-vuln.json
             dependencies-vuln.json
@@ -83,7 +83,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
-          name: snyk-scan-report
+          name: snyk-scan-report-${{ github.run_id }}
           path: |
             image-vuln.json
 
@@ -94,7 +94,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4 # Use the latest version
         with:
-          name: snyk-scan-report # Must match the name used during upload
+          name: snyk-scan-report-${{ github.run_id }} # Must match the name used during upload
       - name: Read the code report
         run: cat code-vuln.json | jq .
       - name: Read the dependencies report
