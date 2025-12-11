@@ -65,8 +65,6 @@ jobs:
       contents: read
       packages: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Convert Repository Name to LowerCase
         run: echo IMAGE_REPOSITORY=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
       - name: Donwload, Install and Initialize Snyk
