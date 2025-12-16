@@ -28,6 +28,30 @@ jobs:
           push: true
           tags: ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing
 
+  snyk-terraform-scan:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Donwload, Install and Initialize Terraform CLI
+        uses: ./.github/actions/terraform-cli
+      - name: Donwload, Install and Initialize Snyk
+        uses: ./.github/actions/snyk-cli
+        with:
+          snyk-token: ${{ secrets.SNYK_TOKEN }}
+      - name: Scan terraform files using Snyk
+        continue-on-error: true
+        run: |
+          snyk iac test ./terraform --org=${{ secrets.SNYK_ORGID }} --report --json-file-output=terraform-vuln.json
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4 # Use the latest version
+        with:
+          name: snyk-code-scan-report-${{ github.run_id }}
+          overwrite: true
+          path: |
+            terraform-vuln.json
+
   snyk-code-scan:
     runs-on: ubuntu-latest
     needs: build
@@ -103,3 +127,5 @@ jobs:
           name: snyk-image-scan-report-${{ github.run_id }} # Must match the name used during upload
       - name: Read the image report
         run: cat image-vuln.json | jq .
+      - name: Read the image report
+        run: cat terraform-vuln.json | jq .
