@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
-          name: snyk-code-scan-report-${{ github.run_id }}
+          name: snyk-terraform-scan-report-${{ github.run_id }}
           overwrite: true
           path: |
             terraform-vuln.json
@@ -127,5 +127,9 @@ jobs:
           name: snyk-image-scan-report-${{ github.run_id }} # Must match the name used during upload
       - name: Read the image report
         run: cat image-vuln.json | jq .
-      - name: Read the image report
+      - name: Download terraform scan artifact
+        uses: actions/download-artifact@v4 # Use the latest version
+        with:
+          name: snyk-terraform-scan-report-${{ github.run_id }} # Must match the name used during upload
+      - name: Read the terraform report
         run: cat terraform-vuln.json | jq .
