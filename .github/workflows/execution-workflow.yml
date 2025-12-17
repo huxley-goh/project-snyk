@@ -16,6 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Execute Docker custom action
-        uses: ./github/actions/hello-world-docker-action
+        uses: ./.github/actions/hello-world-docker-action
         with:
           who-to-greet: 'abc123'
