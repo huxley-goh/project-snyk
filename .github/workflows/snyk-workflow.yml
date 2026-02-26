@@ -112,6 +112,7 @@ jobs:
       - name: Scan container image using Snyk
         continue-on-error: true
         run: |
+          snyk container monitor ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }}
           snyk container test ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }} --json-file-output=image-vuln.json --severity-threshold=high --fail-on=all
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
