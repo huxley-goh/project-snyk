@@ -82,7 +82,8 @@ jobs:
         continue-on-error: true
         run: |
           pip install -r requirements.txt
-          snyk test --all-projects --org=${{ secrets.SNYK_ORGID }} --json-file-output=dependencies-vuln.json --severity-threshold=high --fail-on=all
+          snyk test --all-projects --org=${{ secrets.SNYK_ORGID }} --json-file-output=dependencies-vuln.json --severity-threshold=high --fail-on=all --print-deps
+          snyk monitor --all-projects --org=${{ secrets.SNYK_ORGID }} --reachability=true --fail-fast
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
