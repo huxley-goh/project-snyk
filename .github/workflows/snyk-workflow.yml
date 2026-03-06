@@ -99,7 +99,7 @@ jobs:
           overwrite: true
           path: |
             code-vuln.html
-            dependencies-vuln.json
+            dependencies-vuln.html
   
   snyk-image-scan:
     runs-on: ubuntu-latest
