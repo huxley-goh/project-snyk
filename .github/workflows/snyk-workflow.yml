@@ -54,7 +54,7 @@ jobs:
       - name: Scan terraform files using Snyk
         continue-on-error: true
         run: |
-          snyk iac test ./terraform --org=${{ secrets.SNYK_ORGID }} --report --json-file-output=terraform-vuln.json
+          snyk iac test ./terraform --org=${{ secrets.SNYK_ORGID }} --report --json-file-output=terraform-vuln.json || true
           snyk-to-html -i terraform-vuln.json -o terraform-vuln.html -s
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
