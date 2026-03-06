@@ -1,0 +1,5 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "snyk.advanced.organization": "066db5ac-3527-46cd-a1c5-c03536532cf3",
+    "snyk.advanced.autoSelectOrganization": true
+}

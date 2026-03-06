@@ -10,6 +10,9 @@ runs:
     - name: "Donwload, Install and Initialize Snyk"
       shell: bash
       run: |
+        curl https://github.com/snyk/snyk-to-html/releases/latest/download/snyk-to-html-linux -o snyk-to-html
+        chmod +x ./snyk-to-html
+        mv ./snyk-to-html /usr/local/bin/
         curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
         chmod +x ./snyk
         mv ./snyk /usr/local/bin/

@@ -54,14 +54,14 @@ jobs:
       - name: Scan terraform files using Snyk
         continue-on-error: true
         run: |
-          snyk iac test ./terraform --org=${{ secrets.SNYK_ORGID }} --report --json-file-output=terraform-vuln.json
+          snyk iac test ./terraform --org=${{ secrets.SNYK_ORGID }} --report --json | snyk-to-html -o terraform-vuln.html
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
           name: snyk-terraform-scan-report-${{ github.run_id }}
           overwrite: true
           path: |
-            terraform-vuln.json
+            terraform-vuln.html
 
   snyk-code-scan:
     runs-on: ubuntu-latest
@@ -77,21 +77,21 @@ jobs:
       - name: Scan app code using Snyk
         continue-on-error: true
         run: |
-          snyk code test --org=${{ secrets.SNYK_ORGID }} --report --project-name=${{ github.repository }} --json-file-output=code-vuln.json
+          snyk code test --org=${{ secrets.SNYK_ORGID }} --report --project-name=${{ github.repository }} --json | snyk-to-html -o code-vuln.html
       - name: Scan app dependencies using Snyk
         continue-on-error: true
         run: |
           pip install -r requirements.txt
           snyk monitor --all-projects --org=${{ secrets.SNYK_ORGID }} --reachability=true --fail-fast
-          snyk test --all-projects --org=${{ secrets.SNYK_ORGID }} --json-file-output=dependencies-vuln.json --severity-threshold=high --fail-on=all --print-deps
+          snyk test --all-projects --org=${{ secrets.SNYK_ORGID }} --severity-threshold=high --fail-on=all --print-deps --json | snyk-to-html -o dependencies-vuln.html
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
           name: snyk-code-scan-report-${{ github.run_id }}
           overwrite: true
           path: |
-            code-vuln.json
-            dependencies-vuln.json
+            code-vuln.html
+            dependencies-vuln.html
   
   snyk-image-scan:
     runs-on: ubuntu-latest
@@ -113,14 +113,14 @@ jobs:
         continue-on-error: true
         run: |
           snyk container monitor ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }}
-          snyk container test ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }} --json-file-output=image-vuln.json --severity-threshold=high --fail-on=all
+          snyk container test ghcr.io/${{ env.IMAGE_REPOSITORY }}:nginx-testing --org=${{ secrets.SNYK_ORGID }} --severity-threshold=high --fail-on=all --json | snyk-to-html -o image-vuln.html
       - name: Upload artifact
         uses: actions/upload-artifact@v4 # Use the latest version
         with:
           name: snyk-image-scan-report-${{ github.run_id }}
           overwrite: true
           path: |
-            image-vuln.json
+            image-vuln.html
 
   report:
     runs-on: ubuntu-latest
@@ -130,19 +130,19 @@ jobs:
         uses: actions/download-artifact@v4 # Use the latest version
         with:
           name: snyk-code-scan-report-${{ github.run_id }} # Must match the name used during upload
-      - name: Read the code report
-        run: cat code-vuln.json | jq .
-      - name: Read the dependencies report
-        run: cat dependencies-vuln.json | jq .
+      # - name: Read the code report
+      #   run: cat code-vuln.json | jq .
+      # - name: Read the dependencies report
+      #   run: cat dependencies-vuln.json | jq .
       - name: Download image scan artifact
         uses: actions/download-artifact@v4 # Use the latest version
         with:
           name: snyk-image-scan-report-${{ github.run_id }} # Must match the name used during upload
-      - name: Read the image report
-        run: cat image-vuln.json | jq .
-      - name: Download terraform scan artifact
-        uses: actions/download-artifact@v4 # Use the latest version
-        with:
-          name: snyk-terraform-scan-report-${{ github.run_id }} # Must match the name used during upload
-      - name: Read the terraform report
-        run: cat terraform-vuln.json | jq .
+      # - name: Read the image report
+      #   run: cat image-vuln.json | jq .
+      # - name: Download terraform scan artifact
+      #   uses: actions/download-artifact@v4 # Use the latest version
+      #   with:
+      #     name: snyk-terraform-scan-report-${{ github.run_id }} # Must match the name used during upload
+      # - name: Read the terraform report
+      #   run: cat terraform-vuln.json | jq .
