@@ -1,5 +1,5 @@
 # Use the official NGINX base image
-FROM nginx:latest
+FROM nginx:1.29.8-trixie
 
 # Remove the default NGINX index.html
 RUN rm /usr/share/nginx/html/index.html
